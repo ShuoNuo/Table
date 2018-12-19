@@ -34,14 +34,23 @@ public class JsonHelper {
     public static final int JSON_TYPE_ERROR = 3;
 
     private static IJsonFormat mJsonFormat;
+
+
+    private static JsonHelper mInstance;
 /*
     @IntDef({JSON_TYPE_OBJECT,JSON_TYPE_ARRAY,JSON_TYPE_ERROR})
     public @interface JSON_TYPE {
     }
 */
-    public JsonHelper setJsonFormat (IJsonFormat jsonFormat){
-        this.mJsonFormat = jsonFormat;
-        return this;
+    private JsonHelper(){
+
+    }
+    public static JsonHelper setJsonFormat (IJsonFormat jsonFormat){
+        if (mInstance == null){
+            mInstance = new JsonHelper();
+        }
+        mJsonFormat = jsonFormat;
+        return mInstance;
     }
     /**
      * json 转换成Map-List集合
@@ -129,15 +138,15 @@ public class JsonHelper {
     public static List<Object> reflect(JSONArray json){
         List<Object> list = new ArrayList<>();
         try {
-        for(int i = 0;i <json.length();i++){
-            Object o = json.get(i);
-            if(o instanceof JSONArray)
-                list.add(reflect((JSONArray) o));
-            else if(o instanceof JSONObject)
-                list.add(reflect((JSONObject) o));
-            else
-                list.add(o);
-        }
+            for(int i = 0;i <json.length();i++){
+                Object o = json.get(i);
+                if(o instanceof JSONArray)
+                    list.add(reflect((JSONArray) o));
+                else if(o instanceof JSONObject)
+                    list.add(reflect((JSONObject) o));
+                else
+                    list.add(o);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

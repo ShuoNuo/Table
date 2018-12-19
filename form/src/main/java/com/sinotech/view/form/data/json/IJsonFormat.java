@@ -13,7 +13,7 @@ public interface IJsonFormat {
      * @param key
      * @return
      */
-    Boolean isShow(String key);
+    boolean isShow(String key);
 
     /**
      * 可根据 key value值 去格式化值
