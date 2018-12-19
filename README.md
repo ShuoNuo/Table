@@ -5,6 +5,15 @@
 ## 1.用法
 
 使用前，对于Android Studio的用户，可以选择添加:
+在项目的build.gradle添加JitPack仓库
+```
+allprojects {
+    repositories {
+        ...
+        maven { url "https://jitpack.io" }
+    }
+}
+```
 ```java
 	implementation 'com.github.ShuoNuo:PhotoPicker:v1.0'  //指定版本
 ```
