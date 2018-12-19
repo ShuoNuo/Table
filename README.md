@@ -1,7 +1,3 @@
-## 演示
- ![image](https://github.com/jeasonlzy/Screenshots/blob/master/ImagePicker/demo1.png)![image](https://github.com/jeasonlzy/Screenshots/blob/master/ImagePicker/demo2.gif)
- ![image](https://github.com/jeasonlzy/Screenshots/blob/master/ImagePicker/demo3.gif)![image](https://github.com/jeasonlzy/Screenshots/blob/master/ImagePicker/demo5.gif)
-
 ## 1.用法
 
 使用前，对于Android Studio的用户，可以选择添加:
@@ -15,103 +11,141 @@ allprojects {
 }
 ```
 ```java
-	implementation 'com.github.ShuoNuo:PhotoPicker:v1.0'  //指定版本
+	implementation 'com.github.ShuoNuo:Table:v1.0'  
 ```
+可以使用  SmartRefreshLayout 配合上拉加载 下拉刷新
 
+```java
+	implementation 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-alpha-1'
+```
+SmartRefreshLayout 链接地址：[https://github.com/scwang90/SmartRefreshLayout]
 ## 2.功能和参数含义
 
-### 温馨提示:目前库中的预览界面有个原图的复选框,暂时只做了UI,还没有做压缩的逻辑
+### TableConfig 控制图表的样式
 
 |配置参数|参数含义|
 |:--:|--|
-|multiMode|图片选着模式，单选/多选|
-|selectLimit|多选限制数量，默认为9|
-|showCamera|选择照片时是否显示拍照按钮|
-|crop|是否允许裁剪（单选有效）|
-|style|有裁剪时，裁剪框是矩形还是圆形|
-|focusWidth|矩形裁剪框宽度（圆形自动取宽高最小值）|
-|focusHeight|矩形裁剪框高度（圆形自动取宽高最小值）|
-|outPutX|裁剪后需要保存的图片宽度|
-|outPutY|裁剪后需要保存的图片高度|
-|isSaveRectangle|裁剪后的图片是按矩形区域保存还是裁剪框的形状，例如圆形裁剪的时候，该参数给true，那么保存的图片是矩形区域，如果该参数给fale，保存的图片是圆形区域|
-|imageLoader|需要使用的图片加载器，自需要实现ImageLoader接口即可|
+|setShowTableTitle|是否显示标题 true/false 默认显示当不显示时，合计滑动有bug|
+|setTableTitleStyle|设置标题字体样式|
+|setFixedYSequence|是否固定表格 Y 列 |
+|setFixedXSequence|是否固定表格 X 列 |
+|setShowXSequence setShowYSequence|是否显示 X Y 列|
+|setYSequenceFormat|格式化 Y 列显示值，可根据实际需要格式化显示值|
+|setLeftAndTopBackgroundColor|设置坐上角表格背景颜色|
+|setContentCellBackgroundFormat|设则内容区域表格背景颜色|
+|setColumnTitleBackground|设置列标题背景颜色|
+|注意|无论是标题、列标题、X、Y序列、内容 的背景、字体、是否固定、是否显示、都有具体API可详细阅读类 TableConfig|
 
 ## 3.代码参考
 
-更多使用，请下载demo参看源代码
+更多使用，请参考Sino_Tech_TMS_Main  modulereport源代码
 
-1. 首先你需要继承 `com.sinotech.tool.photopicker.loader.ImageLoader` 这个接口,实现其中的方法,比如以下代码是使用 `Picasso` 三方加载库实现的
+1. 首先初始化表格  并设置表格的样式
 ```java
-public class PicassoImageLoader implements ImageLoader {
+mReportTable = findViewById(R.id.report_activity_report_table);
 
-    @Override
-    public void displayImage(Activity activity, String path, ImageView imageView, int width, int height) {
-        Picasso.with(activity)//
-                   .load(Uri.fromFile(new File(path)))//
-                .placeholder(R.mipmap.default_image)//
-                .error(R.mipmap.default_image)//
-                .resize(width, height)//
-                .centerInside()//
-                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)//
-                .into(imageView);
-    }
+mReportTable.getConfig()
+                .setShowTableTitle(true)
+                .setTableTitleStyle(mTableTextStyle)
+                .setFixedYSequence(true)
+                .setShowXSequence(true)
+                .setFixedXSequence(true)
+                .setXSequenceBackground(new BaseBackgroundFormat(ContextCompat.getColor(getContext(), R.color.report_xy_bg)))
+                .setYSequenceBackground(new BaseBackgroundFormat(ContextCompat.getColor(getContext(), R.color.report_xy_bg)))
+                .setLeftAndTopBackgroundColor(ContextCompat.getColor(getContext(), R.color.report_xy_bg))
+                .setXSequenceStyle(mTableTextStyle)
+                .setYSequenceStyle(mTableTextStyle)
+                .setYSequenceCellBgFormat(new BaseCellBackgroundFormat<Integer>() {
+                    @Override
+                    public int getBackGroundColor(Integer integer) {
+                        return ContextCompat.getColor(getContext(), R.color.report_xy_bg);
+                    }
+                })
+                .setXSequenceCellBgFormat(new BaseCellBackgroundFormat<Integer>() {
+                    @Override
+                    public int getBackGroundColor(Integer integer) {
+                        return ContextCompat.getColor(getContext(), R.color.report_xy_bg);
+                    }
+                })
+                .setCountBackground(new BaseBackgroundFormat(ContextCompat.getColor(getContext(), R.color.report_xy_bg)))
+                .setContentStyle(mTableTextStyle)
+                .setColumnTitleBackground(new BaseBackgroundFormat(ContextCompat.getColor(getContext(), R.color.color_navigation)))
+                .setColumnTitleStyle(new FontStyle(DensityUtils.sp2px(getContext(), 16), ContextCompat.getColor(getContext(), R.color.white)))
+		.setContentCellBackgroundFormat(new BaseCellBackgroundFormat<CellInfo>() {
+		    @Override
+		    public int getBackGroundColor(CellInfo cellInfo) {
+			if (cellInfo.row % 2 == 1) {
+			    return ContextCompat.getColor(getContext(), R.color.report_content_bg);
+			}
+			return TableConfig.INVALID_COLOR;
+		    }
 
-    @Override
-    public void clearMemoryCache() {
-        //这里是清除缓存的方法,根据需要自己实现
-    }
+		})
+                .setCountStyle(mTableTextStyle)
+                .setYSequenceFormat(new BaseSequenceFormat() {
+                    @Override
+                    public String format(Integer position) {
+                        return position == 1 ? "" : String.valueOf(position - 1);
+                    }
+                });
+```
+
+2. 数据处理，可通过注解加类解析后直接生成表格数据
+###第一类数据
+@SmartTable(name="提货统计",count = true)
+name  为表名  count  是否开启自动统计   该统计为界面显示数据的合，需要自定义合计后面讲解
+@SmartColumn(id =1,name = "到达部门",fixed = true,autoBottomName = "合计")
+id 显示的列顺序 name 列标题 fixed  是否固定 autoBottomName 是否自定义合计名称 用于显示固定的内容
+### 第一类数据 实体 bean
+```java
+@SmartTable(name="提货统计",count = true)
+public class DelivReportBean {
+
+    @SmartColumn(id =1,name = "到达部门",fixed = true,autoBottomName = "合计")
+    private String discDeptName;
+    @SmartColumn(id =2,name = "运单件数",autoCount = true)
+    private int orderCount;    
 }
+List<DelivReportBean> list = getDate();
+mReportTable.setData(list);
+```
+### 第二类数据 Json 字符串  通过 JsonHelper.jsonToMapList 来上生成数据
+```java
+  List<Object> list =  JsonHelper.setJsonFormat(new IJsonFormat() {
+            @Override
+            public String getKeyName(String key) {
+                //获取列标题的名称  可以根据对应的字段返回对应的表题。
+                return key;
+            }
+
+            @Override
+            public boolean isShow(String key) {
+                //根据 字段名来判断是否显示
+                return true;
+            }
+
+            @Override
+            public String getKeyValue(String key, Object value) {
+                //根据 字段名来处理显示的数据   可用来格式化数据
+                return (String) value;
+            }
+
+            @Override
+            public int compare(String key, String key1) {
+                //根据 字段名处理数据的先后顺序
+                return 0;
+            }
+        }).jsonToMapList(String json);
+MapTableData tableData = MapTableData.create("开票信息统计", list);
+mReportTable.setTableData(tableData);
+```
+3. 设置数据可自定义合计  totaldate
+```java
+   table.setData(list,totaldate);
 ```
 
-2. 然后配置图片选择器，一般在Application初始化配置一次就可以,这里就需要将上面的图片加载器设置进来,其余的配置根据需要设置
-```java
-protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_image_picker);
-    
-    ImagePicker imagePicker = ImagePicker.getInstance();
-    imagePicker.setImageLoader(new PicassoImageLoader());   //设置图片加载器
-    imagePicker.setShowCamera(true);  //显示拍照按钮
-    imagePicker.setCrop(true);        //允许裁剪（单选才有效）
-    imagePicker.setSaveRectangle(true); //是否按矩形区域保存
-    imagePicker.setSelectLimit(9);    //选中数量限制
-    imagePicker.setStyle(CropImageView.Style.RECTANGLE);  //裁剪框的形状
-    imagePicker.setFocusWidth(800);   //裁剪框的宽度。单位像素（圆形自动取宽高最小值）
-    imagePicker.setFocusHeight(800);  //裁剪框的高度。单位像素（圆形自动取宽高最小值）
-    imagePicker.setOutPutX(1000);//保存文件的宽度。单位像素
-    imagePicker.setOutPutY(1000);//保存文件的高度。单位像素
-}
-```
+4. 注意事项
+该图表改造默认接收 list 规则数据，不包括 类种类，可使用但可能有 bug;
+totaldate  合计为默认为  String 类型  该 bean 应该与 List 中的实体类一致，否则无法解析
 
-3. 以上配置完成后，在适当的方法中开启相册，例如点击按钮时
-```java
-public void onClick(View v) {
-        Intent intent = new Intent(this, ImageGridActivity.class);
-        startActivityForResult(intent, IMAGE_PICKER);  
-    }
-}
-```
 
-4. 如果你想直接调用相机
-```java
-Intent intent = new Intent(this, ImageGridActivity.class);
-intent.putExtra(ImageGridActivity.EXTRAS_TAKE_PICKERS,true); // 是否是直接打开相机
-      startActivityForResult(intent, REQUEST_CODE_SELECT);
-```
-
-5. 重写`onActivityResult`方法,回调结果
-```java
-@Override
-protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-    super.onActivityResult(requestCode, resultCode, data);
-    if (resultCode == ImagePicker.RESULT_CODE_ITEMS) {
-        if (data != null && requestCode == IMAGE_PICKER) {
-            ArrayList<ImageItem> images = (ArrayList<ImageItem>) data.getSerializableExtra(ImagePicker.EXTRA_RESULT_ITEMS);
-            MyAdapter adapter = new MyAdapter(images);
-            gridView.setAdapter(adapter);
-        } else {
-            Toast.makeText(this, "没有数据", Toast.LENGTH_SHORT).show();
-        }
-    }
-}
-```
