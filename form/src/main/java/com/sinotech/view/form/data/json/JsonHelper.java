@@ -37,11 +37,13 @@ public class JsonHelper {
 
 
     private static JsonHelper mInstance;
-/*
-    @IntDef({JSON_TYPE_OBJECT,JSON_TYPE_ARRAY,JSON_TYPE_ERROR})
-    public @interface JSON_TYPE {
-    }
-*/
+
+    public static boolean mCountInBottom = false;
+    /*
+        @IntDef({JSON_TYPE_OBJECT,JSON_TYPE_ARRAY,JSON_TYPE_ERROR})
+        public @interface JSON_TYPE {
+        }
+    */
     private JsonHelper(){
 
     }
@@ -50,6 +52,7 @@ public class JsonHelper {
             mInstance = new JsonHelper();
         }
         mJsonFormat = jsonFormat;
+        mCountInBottom = mJsonFormat.countInBottom();
         return mInstance;
     }
     /**
@@ -67,7 +70,7 @@ public class JsonHelper {
                 mapList.add(objects);
             }else if(getJSONType(json) == JSON_TYPE_ARRAY){
                 JSONArray jsonArray = new JSONArray(json);
-                mapList = JsonHelper.reflect(jsonArray);//JsonHelper.myReflectList();
+                mapList = myReflectList(JsonHelper.reflect(jsonArray));//JsonHelper.myReflectList();
             }else{
                 Log.e("smartTable","json异常");
             }
@@ -123,7 +126,7 @@ public class JsonHelper {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        myReflect(map);
+//        myReflect(map);
         return map;
     }
     private static String getKeyName(String key ){
@@ -154,69 +157,122 @@ public class JsonHelper {
     }
     private static Map<String, Object> myReflect(Map<String, Object> objectMap){
         ArrayList<Map.Entry<String, Object>> list =  new ArrayList<Map.Entry<String, Object>>(objectMap.entrySet());
-        //从小到大排序（从大到小将o1与o2交换即可）
-        Collections.sort(list, new Comparator<Map.Entry<String, Object>>() {
-
-            @Override
-            public int compare(Map.Entry<String, Object> o1, Map.Entry<String, Object> o2) {
-                if (mJsonFormat != null){
-                    return mJsonFormat.compare(o1.getKey(),o2.getKey());
-                }else {
-                    return LetterUtils.getStringMax(o1.getKey(),o2.getKey());
-                }
-            }
-
-        });
+        List<String> keyList = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            keyList.add(list.get(i).getKey());
+        }
+        if (mJsonFormat != null){
+            keyList = mJsonFormat.compare(keyList);
+        }
         LinkedHashMap<String, Object> map2 = new LinkedHashMap<>();
-        for (Map.Entry<String, Object> entry : list) {
-            String key = entry.getKey();
-            Object object = entry.getValue();
+        for (int i = 0; i < keyList.size(); i++) {
+            String key = keyList.get(i);
+            Object object = getKeyValue(key,list);
             if (mJsonFormat != null){
                 if (mJsonFormat.isShow(key)){
-                    map2.put(key, mJsonFormat.getKeyValue(key,object));
+                    map2.put(key,object);
+                }else {
+                    map2.put(key,object);
                 }
-            }else {
-                map2.put(key, entry.getValue());
             }
         }
+
         return map2;
+    }
+    private static Object getKeyValue(String key ,ArrayList<Map.Entry<String, Object>> list){
+        Object obj = null;
+        for (Map.Entry<String, Object> entry : list) {
+            String entryKey = entry.getKey();
+            if (key.equals(entryKey)){
+                obj = entry.getValue();
+                break;
+            }
+        }
+        return obj;
     }
 
     private static List<Object> myReflectList(List<Object> objectListMap){
+        if (mCountInBottom){
+            return reflectBottomList(objectListMap);
+        }else {
+            return reflectTopList(objectListMap);
+        }
+    }
+
+    private static List<Object> reflectTopList(List<Object> objectListMap){
+        final List<Object> tempObjectListMap = new ArrayList<>();
+
+        int maxKeySizeIndex = 0;
+        int mxaKeySize = 0;
+        for (int i = 0; i < objectListMap.size(); i++) {
+            Map<String, Object> objectMap = (Map<String, Object>) objectListMap.get(i);
+            int tempKeySize = objectMap.size();
+            maxKeySizeIndex = tempKeySize > mxaKeySize ? i : maxKeySizeIndex;
+            mxaKeySize = mxaKeySize > tempKeySize ? mxaKeySize : tempKeySize;
+        }
+        for (int i = -1; i < objectListMap.size(); i++) {
+            if (i != maxKeySizeIndex){
+                Map<String, Object> objectMap;
+                ArrayList<Map.Entry<String, Object>> list;
+                if (i == -1){
+                    objectMap = (Map<String, Object>) objectListMap.get(maxKeySizeIndex);
+                    list = new ArrayList<Map.Entry<String, Object>>(objectMap.entrySet());
+                }else {
+                    objectMap = (Map<String, Object>) objectListMap.get(i);
+                    list = new ArrayList<Map.Entry<String, Object>>(objectMap.entrySet());
+                }
+
+
+                List<String> keyList = new ArrayList<>();
+                for (int j = 0; j < list.size(); j++) {
+                    Map.Entry<String, Object> o1 = list.get(j);
+                    keyList.add(o1.getKey());
+                }
+
+                if (mJsonFormat != null){
+                    keyList = mJsonFormat.compare(keyList);
+                }
+
+                LinkedHashMap<String, Object> map2 = new LinkedHashMap<>();
+                for (int j = 0; j < keyList.size(); j++) {
+                    String key = keyList.get(j);
+                    Object object = getKeyValue(key,list);
+                    if (mJsonFormat != null){
+                        if (mJsonFormat.isShow(key)){
+                            map2.put(key,object);
+                        }
+                    }else {
+                        map2.put(key,object);
+                    }
+                }
+                tempObjectListMap.add(map2);
+            }
+        }
+        return tempObjectListMap;
+    }
+    private static List<Object> reflectBottomList(List<Object> objectListMap){
         final List<Object> tempObjectListMap = new ArrayList<>();
         for (int i = 0; i < objectListMap.size(); i++) {
             Map<String, Object> objectMap = (Map<String, Object>) objectListMap.get(i);
-            final ArrayList<Map.Entry<String, Object>> list =
-                    new ArrayList<Map.Entry<String, Object>>(objectMap.entrySet());
-
+            ArrayList<Map.Entry<String, Object>>  list = new ArrayList<Map.Entry<String, Object>>(objectMap.entrySet());
+            List<String> keyList = new ArrayList<>();
+            for (int j = 0; j < list.size(); j++) {
+                Map.Entry<String, Object> o1 = list.get(j);
+                keyList.add(o1.getKey());
+            }
+            if (mJsonFormat != null){
+                keyList = mJsonFormat.compare(keyList);
+            }
             LinkedHashMap<String, Object> map2 = new LinkedHashMap<>();
-            for (int j = 0; j < list.size(); j++) {
-                Map.Entry<String, Object> o1 = list.get(j);
-                if ("到达部门".equals(o1.getKey())){
-                    map2.put(o1.getKey(), o1.getValue());
-                    break;
-                }
-
-            }
-            for (int j = 0; j < list.size(); j++) {
-                Map.Entry<String, Object> o1 = list.get(j);
-                if ("运费".equals(o1.getKey())){
-                    map2.put(o1.getKey(), o1.getValue());
-                    break;
-                }
-
-            }
-            for (int j = 0; j < list.size(); j++) {
-                Map.Entry<String, Object> o1 = list.get(j);
-                if ("件数".equals(o1.getKey())){
-                    map2.put(o1.getKey(), o1.getValue());
-                    break;
-                }
-            }
-
-            for (Map.Entry<String, Object> entry : list) {
-                if (!"运达部门ID".equals(entry.getKey()) && !"件数".equals(entry.getKey()) &&!"运费".equals(entry.getKey())&&!"到达部门".equals(entry.getKey())){
-                    map2.put(entry.getKey(), entry.getValue());
+            for (int j = 0; j < keyList.size(); j++) {
+                String key = keyList.get(j);
+                Object object = getKeyValue(key,list);
+                if (mJsonFormat != null){
+                    if (mJsonFormat.isShow(key)){
+                        map2.put(key,object);
+                    }
+                }else {
+                    map2.put(key,object);
                 }
             }
             tempObjectListMap.add(map2);

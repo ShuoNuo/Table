@@ -8,6 +8,7 @@ import com.sinotech.view.form.data.column.Column;
 import com.sinotech.view.form.data.column.MapColumn;
 import com.sinotech.view.form.data.format.IFormat;
 import com.sinotech.view.form.data.format.draw.IDrawFormat;
+import com.sinotech.view.form.data.json.JsonHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,9 @@ public class MapTableData extends TableData<Object> {
     private static void getMapColumn(List<Column> columns, String fieldName, String parentKey, List<Object> mapList, IFormat<String> keyFormat) {
         if (mapList != null && mapList.size() > 0) {
             Object o = mapList.get(0);
+            if (JsonHelper.mCountInBottom){
+                o = mapList.get(mapList.size()-1);
+            }
             if (o != null) {
                 if (o instanceof Map) {
                     Map<String, Object> map = (Map<String, Object>) o;

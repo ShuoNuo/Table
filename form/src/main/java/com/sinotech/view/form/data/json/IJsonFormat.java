@@ -1,5 +1,7 @@
 package com.sinotech.view.form.data.json;
 
+import java.util.List;
+
 public interface IJsonFormat {
     /**
      * 用于接卸替换 表头
@@ -25,9 +27,22 @@ public interface IJsonFormat {
 
     /**
      * 列排序
+     * @param keys
+     * @return
+     */
+    List<String> compare(List<String> keys);
+
+    /**
+     * 列排序
      * @param key
      * @param key1
      * @return
      */
     int compare(String key, String key1);
+
+    /**
+     * 合计列显示
+     * @return true  bottom  false top
+     */
+    boolean countInBottom();
 }
