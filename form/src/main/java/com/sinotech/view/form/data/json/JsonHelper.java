@@ -263,6 +263,14 @@ public class JsonHelper {
             if (mJsonFormat != null){
                 keyList = mJsonFormat.compare(keyList);
             }
+            if (mJsonFormat != null){
+                Collections.sort(keyList, new Comparator<String>() {
+                    @Override
+                    public int compare(String o1, String o2) {
+                        return mJsonFormat.compare(o1,o2);
+                    }
+                });
+            }
             LinkedHashMap<String, Object> map2 = new LinkedHashMap<>();
             for (int j = 0; j < keyList.size(); j++) {
                 String key = keyList.get(j);

@@ -3,6 +3,8 @@ package com.sinotech.view.form.data.column;
 
 
 
+import android.util.Log;
+
 import com.sinotech.view.form.data.ArrayStructure;
 import com.sinotech.view.form.data.TableInfo;
 import com.sinotech.view.form.data.format.IFormat;
@@ -10,6 +12,7 @@ import com.sinotech.view.form.data.format.draw.IDrawFormat;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by huang on 2018/2/1.
@@ -77,6 +80,39 @@ public class ArrayColumn<T> extends Column<T> {
                 }
             }
 
+        }
+    }
+    /**
+     * 填充数据
+     * @param objects 对象列表
+     * @return 返回需要合并的单元
+     * @throws NoSuchFieldException
+     * @throws IllegalAccessException
+     */
+    @Override
+    public void fillData(List<Object> objects,Object object) throws NoSuchFieldException, IllegalAccessException {
+        structure.clear();
+        structure.setMaxLevel(getLevel());
+        if(getCountFormat() != null){
+            getCountFormat().clearCount();
+        }
+        if (objects.size() > 0) {
+            String[] fieldNames = getFieldName().split("\\.");
+            if (fieldNames.length > 0) {
+                int size = objects.size();
+                for (int k = 0; k < size; k++) {
+                    Object child= objects.get(k);
+                    getFieldData(fieldNames,0,child,0,true);
+                }
+            }
+
+        }
+        if (object != null) {
+            String[] fieldNames = getFieldName().split("\\.");
+            if (object instanceof Map) {
+                object = ((Map) object).get(fieldNames[0]);
+                addTotalData((T) object);
+            }
         }
     }
 

@@ -230,6 +230,19 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
             notifyDataChanged();
         }
     }
+    /**
+     * 设置表格数据
+     *
+     * @param tableData
+     */
+    public void setTableData(TableData<T> tableData, Object totalDate) {
+        if (tableData != null) {
+            this.tableData = tableData;
+            tableData.setShowCount(true);
+            this.totalDate = (T) totalDate;
+            notifyDataChanged();
+        }
+    }
 
     public ITableTitle getTableTitle() {
         return tableTitle;

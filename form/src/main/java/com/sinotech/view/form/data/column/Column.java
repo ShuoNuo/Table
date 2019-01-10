@@ -544,6 +544,9 @@ public class Column<T> implements Comparable<Column> {
         }
 
     }
+    protected void addTotalData(T t){
+        totalData = t;
+    }
 
     /**
      * 获取等级 如果上面没有parent 则为1，否则等于parent 递归+1
