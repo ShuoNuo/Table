@@ -3,6 +3,7 @@ package com.sinotech.view.form.data.json;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.sinotech.view.form.exception.TableException;
 import com.sinotech.view.form.utils.LetterUtils;
 
 import org.json.JSONArray;
@@ -64,13 +65,53 @@ public class JsonHelper {
                 mapList.add(objects);
             }else if(getJSONType(json) == JSON_TYPE_ARRAY){
                 JSONArray jsonArray = new JSONArray(json);
-                mapList = myNewReflectList(JsonHelper.reflect(jsonArray));//JsonHelper.myReflectList();
+                mapList = JsonHelper.reflect(jsonArray);//JsonHelper.myReflectList();
             }else{
                 Log.e("smartTable","json异常");
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+        return mapList;
+    }
+
+    /**
+     * json 转换成Map-List集合
+     * @param json json
+     * @return Map-List集合
+     */
+    public  static List<Object> jsonReportDateToMapList(String json) {
+        List<Object> mapList = null;
+        if(getJSONType(json) == JSON_TYPE_ARRAY){
+            try {
+                JSONArray jsonArray = new JSONArray(json);
+                mapList = myNewReflectList(JsonHelper.reflect(jsonArray));//JsonHelper.myReflectList();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }else {
+            throw new TableException("报表数据必须为 jsonArray");
+        }
+        return mapList;
+    }
+    /**
+     * json 转换成Map-List集合
+     * @param json json
+     * @return Map-List集合
+     */
+    public  static List<Object> jsonReportTotalToMapList(String json) {
+        List<Object> mapList = null;
+        if(getJSONType(json) == JSON_TYPE_OBJECT){
+            try {
+                json = "[" + json + "]";
+                JSONArray jsonArray = new JSONArray(json);
+                mapList = myNewReflectList(JsonHelper.reflect(jsonArray));//JsonHelper.myReflectList();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }else {
+            throw new TableException("报表合计必须为 jsonObject");
         }
         return mapList;
     }

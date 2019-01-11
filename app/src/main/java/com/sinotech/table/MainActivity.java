@@ -72,12 +72,12 @@ public class MainActivity extends AppCompatActivity {
     private MapTableData getTotalDate(){
         return MapTableData.create("开票信息统计",
                 JsonHelper.setJsonFormat(new OpenOrderFormat())
-                        .jsonToMapList(ReportTestJson.totalJson));
+                        .jsonReportDateToMapList(ReportTestJson.totalJson));
     }
     private MapTableData getReportDate(){
         return MapTableData.create("开票信息统计",
                 JsonHelper.setJsonFormat(new OpenOrderFormat())
-                        .jsonToMapList(ReportTestJson.reportJson));
+                        .jsonReportTotalToMapList(ReportTestJson.reportJson));
     }
 
    /*  JsonHelper.setJsonFormat(new IJsonFormat() {
