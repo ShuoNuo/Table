@@ -38,12 +38,6 @@ public class JsonHelper {
 
     private static JsonHelper mInstance;
 
-    public static boolean mCountInBottom = false;
-    /*
-        @IntDef({JSON_TYPE_OBJECT,JSON_TYPE_ARRAY,JSON_TYPE_ERROR})
-        public @interface JSON_TYPE {
-        }
-    */
     private JsonHelper(){
 
     }
@@ -52,7 +46,6 @@ public class JsonHelper {
             mInstance = new JsonHelper();
         }
         mJsonFormat = jsonFormat;
-        mCountInBottom = mJsonFormat.countInBottom();
         return mInstance;
     }
     /**
@@ -192,24 +185,22 @@ public class JsonHelper {
     }
 
     private static List<Object> myReflectList(List<Object> objectListMap){
-        if (mCountInBottom){
-            return reflectBottomList(objectListMap);
-        }else {
-            return reflectTopList(objectListMap);
-        }
-    }
-
-    private static List<Object> reflectTopList(List<Object> objectListMap){
         final List<Object> tempObjectListMap = new ArrayList<>();
 
         int maxKeySizeIndex = 0;
         int mxaKeySize = 0;
+        /**
+         * 获取 key  最多的 bean
+         */
         for (int i = 0; i < objectListMap.size(); i++) {
             Map<String, Object> objectMap = (Map<String, Object>) objectListMap.get(i);
             int tempKeySize = objectMap.size();
             maxKeySizeIndex = tempKeySize > mxaKeySize ? i : maxKeySizeIndex;
             mxaKeySize = mxaKeySize > tempKeySize ? mxaKeySize : tempKeySize;
         }
+        /**
+         * 多循环一次  先解析key 最多的一组数据   并跳过 maxKeySizeIndex
+         */
         for (int i = -1; i < objectListMap.size(); i++) {
             if (i != maxKeySizeIndex){
                 Map<String, Object> objectMap;
@@ -230,15 +221,36 @@ public class JsonHelper {
                 }
 
                 if (mJsonFormat != null){
-                    keyList = mJsonFormat.compare(keyList);
+                    if (mJsonFormat.isSystemCompare()){//首先判断是否系统自动排序
+                        if (mJsonFormat.getSystemCompareMap()!= null && mJsonFormat.getSystemCompareMap().size() > 0){//判断是否有用户自定义 Map 顺序；
+                            keyList = getMapKeyList(mJsonFormat.getSystemCompareMap(),keyList);
+                        }else {// 无自定义顺序   根据汉字的顺序来排列
+                            Collections.sort(keyList, new Comparator<String>() {
+                                @Override
+                                public int compare(String o1, String o2) {
+                                    return LetterUtils.getStringMax(o1,o2);
+                                }
+                            });
+                        }
+                    }else {//非系统自定义排序
+                        if ( mJsonFormat.compare(keyList) != null && mJsonFormat.compare(keyList).size()> 0){
+                            keyList = mJsonFormat.compare(keyList);//用户自定义List列顺序
+                        }else {
+                            Collections.sort(keyList, new Comparator<String>() {
+                                @Override
+                                public int compare(String o1, String o2) {
+                                    return mJsonFormat.compare(o1,o2);//用户自定义比较规则
+                                }
+                            });
+                        }
+                    }
                 }
-
                 LinkedHashMap<String, Object> map2 = new LinkedHashMap<>();
                 for (int j = 0; j < keyList.size(); j++) {
                     String key = keyList.get(j);
                     Object object = getKeyValue(key,list);
                     if (mJsonFormat != null){
-                        if (mJsonFormat.isShow(key)){
+                        if (mJsonFormat.isShow(key)){//根据 key 判断是否显示该列
                             map2.put(key,object);
                         }
                     }else {
@@ -250,41 +262,23 @@ public class JsonHelper {
         }
         return tempObjectListMap;
     }
-    private static List<Object> reflectBottomList(List<Object> objectListMap){
-        final List<Object> tempObjectListMap = new ArrayList<>();
-        for (int i = 0; i < objectListMap.size(); i++) {
-            Map<String, Object> objectMap = (Map<String, Object>) objectListMap.get(i);
-            ArrayList<Map.Entry<String, Object>>  list = new ArrayList<Map.Entry<String, Object>>(objectMap.entrySet());
-            List<String> keyList = new ArrayList<>();
-            for (int j = 0; j < list.size(); j++) {
-                Map.Entry<String, Object> o1 = list.get(j);
-                keyList.add(o1.getKey());
-            }
-            if (mJsonFormat != null){
-                keyList = mJsonFormat.compare(keyList);
-            }
-            if (mJsonFormat != null){
-                Collections.sort(keyList, new Comparator<String>() {
-                    @Override
-                    public int compare(String o1, String o2) {
-                        return mJsonFormat.compare(o1,o2);
+    private static List<String> getMapKeyList (Map<Integer,String> map, List<String> keys){
+        List<String> tempKeys = new ArrayList<>();
+        for (int i = 0; i < map.size(); i++) {
+            String key = map.get(i);
+            if (keys.size()>0){
+                for (int j = 0; j < keys.size(); j++) {
+                    if (key.equals(keys.get(j))){
+                        tempKeys.add(key);
+                        keys.remove(j);
+                        break;
                     }
-                });
-            }
-            LinkedHashMap<String, Object> map2 = new LinkedHashMap<>();
-            for (int j = 0; j < keyList.size(); j++) {
-                String key = keyList.get(j);
-                Object object = getKeyValue(key,list);
-                if (mJsonFormat != null){
-                    if (mJsonFormat.isShow(key)){
-                        map2.put(key,object);
-                    }
-                }else {
-                    map2.put(key,object);
                 }
             }
-            tempObjectListMap.add(map2);
         }
-        return tempObjectListMap;
+        if (keys.size() > 0){
+            tempKeys.addAll(keys);
+        }
+        return tempKeys;
     }
 }

@@ -1,6 +1,7 @@
 package com.sinotech.view.form.data.json;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IJsonFormat {
     /**
@@ -41,8 +42,14 @@ public interface IJsonFormat {
     int compare(String key, String key1);
 
     /**
-     * 合计列显示
-     * @return true  bottom  false top
+     * 是否系统自动排列
+     * @return
      */
-    boolean countInBottom();
+    boolean isSystemCompare();
+
+    /**
+     * 或取系统排列的 map  由报表中类统一维护
+     * @return
+     */
+    Map<Integer,String> getSystemCompareMap();
 }

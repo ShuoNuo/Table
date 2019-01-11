@@ -41,7 +41,7 @@ public class LetterUtils {
         String t1s = PinYin.toPinYin((String)t1);
         String t2s = PinYin.toPinYin((String)t2);
         int maxRuselt = 0;
-        if (isChinese(t1s) && isChinese(t2s)){
+        if (isChinese((String) t1) && isChinese((String) t2)){
             int minlength = t1s.length() > t2s.length() ?  t2s.length(): t1s.length() ;
             for (int i = 0; i < minlength; i++) {
                 if (t1s.charAt(i) - t2s.charAt(i) != 0){

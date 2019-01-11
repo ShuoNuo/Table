@@ -1,15 +1,9 @@
 package com.sinotech.table;
 
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.sinotech.view.form.core.SmartTable;
-import com.sinotech.view.form.core.TableConfig;
-import com.sinotech.view.form.data.CellInfo;
-import com.sinotech.view.form.data.format.bg.BaseCellBackgroundFormat;
 import com.sinotech.view.form.data.format.sequence.BaseSequenceFormat;
 import com.sinotech.view.form.data.json.IJsonFormat;
 import com.sinotech.view.form.data.json.JsonHelper;
@@ -21,6 +15,7 @@ import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -79,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                 JsonHelper.setJsonFormat(new IJsonFormat() {
                     @Override
                     public String getKeyName(String key) {
-                        return ReportKeyNameUtils.getKeyName(key);
+                        return ReportKeyNameUtils.getKeyNameTest(key);
                     }
 
                     @Override
@@ -103,9 +98,15 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public boolean countInBottom() {
-                        return false;
+                    public boolean isSystemCompare() {
+                        return true;
                     }
+
+                    @Override
+                    public Map<Integer, String> getSystemCompareMap() {
+                        return ReportSystemCompareMap.getSystemCompareMap();
+                    }
+
                 })
                         .jsonToMapList("[" +
                                 "        {" +
@@ -145,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                 JsonHelper.setJsonFormat(new IJsonFormat() {
                     @Override
                     public String getKeyName(String key) {
-                        return ReportKeyNameUtils.getKeyName(key);
+                        return ReportKeyNameUtils.getKeyNameTest(key);
                     }
 
                     @Override
@@ -169,9 +170,15 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public boolean countInBottom() {
-                        return false;
+                    public boolean isSystemCompare() {
+                        return true;
                     }
+
+                    @Override
+                    public Map<Integer, String> getSystemCompareMap() {
+                        return ReportSystemCompareMap.getSystemCompareMap();
+                    }
+
                 })
                         .jsonToMapList("[" +
                                 "        {" +
