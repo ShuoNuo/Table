@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(String response, int id) {
                         MapTableData tableData = getReportDate();
                         MapTableData totalDate = getTotalDate();
-                        table.setTableData(tableData,totalDate.getT().get(0));
+                        table.setTableData(tableData,totalDate);
 //                        table.setTableData(tableData);
                     }
                 });

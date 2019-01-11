@@ -236,12 +236,12 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
      *
      * @param tableData
      */
-    public void setTableData(TableData<T> tableData, Object totalDate) {
+    public void setTableData(TableData<T> tableData, TableData<T> totalDate) {
         if (tableData != null) {
             JsonHelper.isFixCount = true;
             this.tableData = tableData;
             tableData.setShowCount(true);
-            this.totalDate = (T) totalDate;
+            this.totalDate = (T) totalDate.getT().get(0);
             notifyDataChanged();
         }
     }
