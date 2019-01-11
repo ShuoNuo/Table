@@ -35,8 +35,9 @@ public class JsonHelper {
 
     private static IJsonFormat mJsonFormat;
 
-
     private static JsonHelper mInstance;
+
+    public static boolean isFixCount = false;
 
     private JsonHelper(){
 
@@ -63,7 +64,7 @@ public class JsonHelper {
                 mapList.add(objects);
             }else if(getJSONType(json) == JSON_TYPE_ARRAY){
                 JSONArray jsonArray = new JSONArray(json);
-                mapList = myReflectList(JsonHelper.reflect(jsonArray));//JsonHelper.myReflectList();
+                mapList = myNewReflectList(JsonHelper.reflect(jsonArray));//JsonHelper.myReflectList();
             }else{
                 Log.e("smartTable","json异常");
             }
@@ -184,6 +185,11 @@ public class JsonHelper {
         return obj;
     }
 
+    /**
+     * 该方法存在缺陷  废弃
+     * @param objectListMap
+     * @return
+     */
     private static List<Object> myReflectList(List<Object> objectListMap){
         final List<Object> tempObjectListMap = new ArrayList<>();
 
@@ -262,6 +268,69 @@ public class JsonHelper {
         }
         return tempObjectListMap;
     }
+
+    private static List<Object> myNewReflectList(List<Object> objectListMap){
+        final List<Object> tempObjectListMap = new ArrayList<>();
+        List<String> keys = getAllKeys(objectListMap);
+        /**
+         * 多循环一次  先解析key 最多的一组数据   并跳过 maxKeySizeIndex
+         */
+        for (int i = 0; i < objectListMap.size(); i++) {
+            Map<String, Object> objectMap = (Map<String, Object>) objectListMap.get(i);
+            ArrayList<Map.Entry<String, Object>> list = new ArrayList<Map.Entry<String, Object>>(objectMap.entrySet());
+            List<String> keyList = new ArrayList<>();
+            if (i == 0){
+                keyList = keys;
+            }else {
+                for (int j = 0; j < list.size(); j++) {
+                    Map.Entry<String, Object> o1 = list.get(j);
+                    keyList.add(o1.getKey());
+                }
+            }
+            if (mJsonFormat != null){
+                if (mJsonFormat.isSystemCompare()){//首先判断是否系统自动排序
+                    if (mJsonFormat.getSystemCompareMap()!= null && mJsonFormat.getSystemCompareMap().size() > 0){//判断是否有用户自定义 Map 顺序；
+                        keyList = getMapKeyList(mJsonFormat.getSystemCompareMap(),keyList);
+                    }else {// 无自定义顺序   根据汉字的顺序来排列
+                        Collections.sort(keyList, new Comparator<String>() {
+                            @Override
+                            public int compare(String o1, String o2) {
+                                return LetterUtils.getStringMax(o1,o2);
+                            }
+                        });
+                    }
+                }else {//非系统自定义排序
+                    if ( mJsonFormat.compare(keyList) != null && mJsonFormat.compare(keyList).size()> 0){
+                        keyList = mJsonFormat.compare(keyList);//用户自定义List列顺序
+                    }else {
+                        Collections.sort(keyList, new Comparator<String>() {
+                            @Override
+                            public int compare(String o1, String o2) {
+                                return mJsonFormat.compare(o1,o2);//用户自定义比较规则
+                            }
+                        });
+                    }
+                }
+            }
+            LinkedHashMap<String, Object> map2 = new LinkedHashMap<>();
+            for (int j = 0; j < keyList.size(); j++) {
+                String key = keyList.get(j);
+                Object object = getKeyValue(key,list);
+                if (mJsonFormat != null){
+                    if (mJsonFormat.isShow(key)){//根据 key 判断是否显示该列
+                        map2.put(key,object);
+                    }
+                }else {
+                    map2.put(key,object);
+                }
+            }
+            tempObjectListMap.add(map2);
+        }
+        return tempObjectListMap;
+    }
+
+
+
     private static List<String> getMapKeyList (Map<Integer,String> map, List<String> keys){
         List<String> tempKeys = new ArrayList<>();
         for (int i = 0; i < map.size(); i++) {
@@ -280,5 +349,33 @@ public class JsonHelper {
             tempKeys.addAll(keys);
         }
         return tempKeys;
+    }
+
+    /**
+     * 遍历循环获取所有的  key
+     * @param objectListMap
+     * @return
+     */
+    private static List<String> getAllKeys(List<Object> objectListMap){
+        List<String> tempAllKeys = new ArrayList<>();
+        for (int i = 0; i < objectListMap.size(); i++) {
+            Map<String, Object> objectMap = (Map<String, Object>) objectListMap.get(i);
+            ArrayList<Map.Entry<String, Object>> list =new ArrayList<Map.Entry<String, Object>>(objectMap.entrySet());;
+            for (int j = 0; j < list.size(); j++) {
+                Map.Entry<String, Object> o1 = list.get(j);
+                String key = o1.getKey();
+                boolean isExitkey = false;
+                for (int k = 0; k < tempAllKeys.size(); k++) {
+                    if (key.equals(tempAllKeys.get(k))){
+                        isExitkey = true;
+                        break;
+                    }
+                }
+                if (!isExitkey){
+                    tempAllKeys.add(key);
+                }
+            }
+        }
+        return tempAllKeys;
     }
 }

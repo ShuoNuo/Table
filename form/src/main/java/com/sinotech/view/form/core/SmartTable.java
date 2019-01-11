@@ -20,6 +20,7 @@ import com.sinotech.view.form.component.YSequence;
 import com.sinotech.view.form.data.TableInfo;
 import com.sinotech.view.form.data.column.Column;
 import com.sinotech.view.form.data.format.selected.ISelectFormat;
+import com.sinotech.view.form.data.json.JsonHelper;
 import com.sinotech.view.form.data.style.FontStyle;
 import com.sinotech.view.form.data.table.PageTableData;
 import com.sinotech.view.form.data.table.TableData;
@@ -237,6 +238,7 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
      */
     public void setTableData(TableData<T> tableData, Object totalDate) {
         if (tableData != null) {
+            JsonHelper.isFixCount = true;
             this.tableData = tableData;
             tableData.setShowCount(true);
             this.totalDate = (T) totalDate;
