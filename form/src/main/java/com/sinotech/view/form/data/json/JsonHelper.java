@@ -183,7 +183,7 @@ public class JsonHelper {
                 else if(o instanceof JSONObject)
                     list.add(reflect((JSONObject) o));
                 else
-                    list.add(o);
+                    list.add(o.toString());
             }
         } catch (JSONException e) {
             e.printStackTrace();
