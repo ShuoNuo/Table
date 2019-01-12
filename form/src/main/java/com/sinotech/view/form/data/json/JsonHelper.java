@@ -156,7 +156,7 @@ public class JsonHelper {
                     map.put(key, reflect((JSONObject) o));
                 }
                 else
-                    map.put(getKeyName(key), o);
+                    map.put(getKeyName(key), o.toString());
             }
         } catch (JSONException e) {
             e.printStackTrace();
