@@ -156,7 +156,7 @@ public class JsonHelper {
                     map.put(key, reflect((JSONObject) o));
                 }
                 else
-                    map.put(getKeyName(key), o.toString());
+                    map.put(getKeyName(key), LetterUtils.isNumber(o) ? String.valueOf(o.toString()):o.toString());
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -183,7 +183,7 @@ public class JsonHelper {
                 else if(o instanceof JSONObject)
                     list.add(reflect((JSONObject) o));
                 else
-                    list.add(o.toString());
+                    list.add(LetterUtils.isNumber(o) ? String.valueOf(o.toString()):o.toString());
             }
         } catch (JSONException e) {
             e.printStackTrace();

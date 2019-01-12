@@ -57,10 +57,13 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onResponse(String response, int id) {
+                        MapTableData.create("开票信息统计",
+                                JsonHelper.setJsonFormat(new OpenOrderFormat())
+                                        .jsonToMapList(response));
                         MapTableData tableData = getReportDate();
                         MapTableData totalDate = getTotalDate();
-                        table.setTableData(tableData,totalDate);
-//                        table.setTableData(tableData);
+//                        table.setTableData(tableData,totalDate);
+                        table.setTableData(tableData);
                     }
                 });
     }
