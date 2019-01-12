@@ -1,21 +1,16 @@
 package com.sinotech.table;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.sinotech.view.form.core.SmartTable;
 import com.sinotech.view.form.data.format.sequence.BaseSequenceFormat;
-import com.sinotech.view.form.data.json.IJsonFormat;
 import com.sinotech.view.form.data.json.JsonHelper;
 import com.sinotech.view.form.data.style.FontStyle;
 import com.sinotech.view.form.data.table.MapTableData;
 import com.sinotech.view.form.utils.DensityUtils;
-import com.sinotech.view.form.utils.LetterUtils;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.StringCallback;
-
-import java.util.List;
-import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.MediaType;

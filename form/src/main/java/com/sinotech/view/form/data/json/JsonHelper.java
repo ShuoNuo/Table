@@ -219,7 +219,11 @@ public class JsonHelper {
         for (Map.Entry<String, Object> entry : list) {
             String entryKey = entry.getKey();
             if (key.equals(entryKey)){
-                obj = entry.getValue();
+                if (mJsonFormat != null){
+                    obj = mJsonFormat.getKeyValue(key,entry.getValue());
+                }else {
+                    obj = entry.getValue();
+                }
                 break;
             }
         }
