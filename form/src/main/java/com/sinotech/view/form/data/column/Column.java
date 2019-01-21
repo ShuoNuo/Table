@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by huang on 2017/10/31.
@@ -239,6 +240,15 @@ public class Column<T> implements Comparable<Column> {
             Object child = o;
             for (int i = 0; i < fieldNames.length; i++) {
                 if (child == null) {
+                    return null;
+                }
+                if (child instanceof Map) {
+                    Map<String ,String > childKey = (Map<String, String>) child;
+                    for (String key : childKey.keySet()){
+                        if (key.equals(fieldNames[i])){
+                            return (T) childKey.get(key);
+                        }
+                    }
                     return null;
                 }
                 Class childClazz = child.getClass();

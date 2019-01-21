@@ -50,9 +50,17 @@ public class LetterUtils {
                 }
             }
         }else {
-            if (t1 != null && t2 != null){
-                if (t1s.length() > 0 && t2s.length() > 0){
-                    maxRuselt = t1s.charAt(0) - t2s.charAt(0);
+            boolean isReturn = true;
+            try{
+                return getNumMax(t1,t2);
+            }catch (NumberFormatException e){
+                isReturn = false;
+            }
+            if (!isReturn){
+                if (t1 != null && t2 != null){
+                    if (t1s.length() > 0 && t2s.length() > 0){
+                        maxRuselt = t1s.charAt(0) - t2s.charAt(0);
+                    }
                 }
             }
         }

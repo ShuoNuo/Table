@@ -231,47 +231,56 @@ public class TableParser<T> {
     public List<Column> sort(TableData<T> tableData) {
 
         final Column sortColumn = tableData.getSortColumn();
-        if (sortColumn != null) {
-            List<T> dataList = tableData.getT();
-            Collections.sort(dataList, new Comparator<T>() {
-                @Override
-                public int compare(T o1, T o2) {
+        try{
+            if (sortColumn != null) {
+                List<T> dataList = tableData.getT();
 
-                    try {
-                        if (o1 == null) {
-                            return sortColumn.isReverseSort() ? 1 : -1;
-                        }
-                        if (o2 == null) {
-                            return sortColumn.isReverseSort() ? -1 : 1;
-                        }
-                        Object data = sortColumn.getData(o1);
-                        Object compareData = sortColumn.getData(o2);
-                        if (data == null) {
-                            return sortColumn.isReverseSort() ? 1 : -1;
-                        }
-                        if (compareData == null) {
-                            return sortColumn.isReverseSort() ? -1 : 1;
-                        }
-                        int compare;
-                        if (sortColumn.getComparator() != null) {
-                            compare = sortColumn.getComparator().compare(data, compareData);
-                            return sortColumn.isReverseSort() ? -compare : compare;
-                        } else {
-                            if (data instanceof Comparable) {
-                                compare = ((Comparable) data).compareTo(compareData);
-                                return sortColumn.isReverseSort() ? -compare : compare;
+                Collections.sort(dataList, new Comparator<T>() {
+                    @Override
+                    public int compare(T o1, T o2) {
+
+                        try {
+                            if (o1 == null) {
+                                return sortColumn.isReverseSort() ? 1 : -1;
                             }
-                            return 0;
+                            if (o2 == null) {
+                                return sortColumn.isReverseSort() ? -1 : 1;
+                            }
+                            Object data = sortColumn.getData(o1);
+                            Object compareData = sortColumn.getData(o2);
+                            if (data == null) {
+                                return sortColumn.isReverseSort() ? 1 : -1;
+                            }
+                            if (compareData == null) {
+                                return sortColumn.isReverseSort() ? -1 : 1;
+                            }
+                            int compare;
+                            if (sortColumn.getComparator() != null) {
+                                compare = sortColumn.getComparator().compare(data, compareData);
+                                return sortColumn.isReverseSort() ? -compare : compare;
+                            } else {
+                                if (data instanceof Comparable) {
+                                    compare = ((Comparable) data).compareTo(compareData);
+                                    return sortColumn.isReverseSort() ? -compare : compare;
+                                }
+                                return 0;
+                            }
+                        } catch (NoSuchFieldException e) {
+                            e.printStackTrace();
+                            throw new TableException(
+                                    "NoSuchFieldException :Please check whether field name is correct!");
+                        } catch (IllegalAccessException e) {
+//                        e.printStackTrace();
+                            throw new TableException(
+                                    "IllegalAccessException :Please make sure that access objects are allowed!");
                         }
-                    } catch (NoSuchFieldException e) {
-                        throw new TableException(
-                                "NoSuchFieldException :Please check whether field name is correct!");
-                    } catch (IllegalAccessException e) {
-                        throw new TableException(
-                                "IllegalAccessException :Please make sure that access objects are allowed!");
+
                     }
-                }
-            });
+
+                });
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
         return tableData.getColumns();
     }
