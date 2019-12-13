@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 
 import com.sinotech.view.form.component.IComponent;
@@ -59,6 +60,7 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
     private boolean isExactly = true; //是否是测量精准模式
     private AtomicBoolean isNotifying = new AtomicBoolean(false); //是否正在更新数据
     private boolean isYSequenceRight;
+    private boolean isInitSuccess = false;
 
 
     public SmartTable(Context context) {
@@ -98,7 +100,7 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
         matrixHelper.setOnTableChangeListener(this);
         matrixHelper.register(provider);
         matrixHelper.setOnInterceptListener(provider.getOperation());
-
+        isInitSuccess = true;
     }
 
     /**
@@ -255,7 +257,10 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
      * 通知更新
      */
     public void notifyDataChanged() {
-
+        if (!isInitSuccess){
+            Toast.makeText(getContext(),"表格尚未初始化成功",Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (tableData != null) {
             config.setPaint(paint);
             //开启线程
