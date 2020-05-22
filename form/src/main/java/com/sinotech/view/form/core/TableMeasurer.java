@@ -156,16 +156,11 @@ public class TableMeasurer<T> {
         for(Column column:tableData.getChildColumns()){
             float columnNameWidth =tableData.getTitleDrawFormat().measureWidth(column,config)
                     +config.getColumnTitleHorizontalPadding()*2;
-            Log.e("width","columnNameWidth"+columnNameWidth);
-            Log.e("width","columnName"+column.getColumnName());
             int columnTotalWidth = 0;
             if (totalDate != null){
-                /** 新增代码 start*/
                 config.getContentStyle().fillPaint(paint);
                 String[] totalString =  new String[]{column.getTotalDatas()};
                 columnTotalWidth = DrawUtils.getMultiTextWidth(paint,totalString)+config.getHorizontalPadding()*2;
-                Log.e("width","columnTotalWidth"+columnTotalWidth);
-                Log.e("width","columnTotal"+column.getTotalDatas());
             }
             int columnWidth =0;
             size = column.getDatas().size();
@@ -174,7 +169,6 @@ public class TableMeasurer<T> {
             Cell[][] rangeCells = tableData.getTableInfo().getRangeCells();
             for(int position = 0;position < size;position++) {
                 int width = column.getDrawFormat().measureWidth(column, position, config);
-                Log.e("width","width"+width);
                 measureRowHeight(config, lineHeightArray, column, currentPosition, position);
                 int skipPosition = tableInfo.getSeizeCellSize(column, position);
                 currentPosition += skipPosition;
