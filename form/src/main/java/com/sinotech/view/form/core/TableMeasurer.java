@@ -38,7 +38,7 @@ public class TableMeasurer<T> {
     public TableInfo measure(TableData<T> tableData, T totalDate,TableConfig config){
         isReMeasure = true;
         TableInfo tableInfo = tableData.getTableInfo();
-        int width = getTableWidth(tableData,config);
+        int width = getTableWidth(tableData,totalDate,config);
         int height = getTableHeight(tableData,config);
         tableInfo.setTableRect(new Rect(0,0,width,height));
         measureColumnSize(tableData);
