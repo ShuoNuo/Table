@@ -274,7 +274,12 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
                         parser.parse(tableData);
                     }
                     //long start = System.currentTimeMillis();
-                    TableInfo info = measurer.measure(tableData, config);
+                    TableInfo info;
+                    if (totalDate != null){
+                        info = measurer.measure(tableData,totalDate, config);
+                    }else {
+                        info = measurer.measure(tableData, config);
+                    }
                     xAxis.setHeight(info.getTopHeight());
                     yAxis.setWidth(info.getyAxisWidth());
                     requestReMeasure();
