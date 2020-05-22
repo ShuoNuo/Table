@@ -144,7 +144,7 @@ public class TableMeasurer<T> {
             /** 新增代码 start*/
             config.getContentStyle().fillPaint(paint);
             String[] totalString =  new String[]{totalDate.toString()};
-            columnTotalWidth = DrawUtils.getMultiTextWidth(paint,totalString);
+            columnTotalWidth = DrawUtils.getMultiTextWidth(paint,totalString)+config.getColumnTitleHorizontalPadding()*2;
         }
         config.getYSequenceStyle().fillPaint(paint);
         int totalSize = tableData.getLineSize();
