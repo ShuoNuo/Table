@@ -64,13 +64,11 @@ public class SmartTable<T> extends View implements OnTableChangeListener {
 
 
     public SmartTable(Context context) {
-        super(context);
-        init();
+        this(context,null);
     }
 
     public SmartTable(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init();
+        this(context, attrs,0);
     }
 
     public SmartTable(Context context, AttributeSet attrs, int defStyleAttr) {
