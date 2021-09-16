@@ -4,6 +4,10 @@ package com.sinotech.view.form.utils;
 import com.sinotech.view.form.pinyin.PinYin;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,24 +46,37 @@ public class LetterUtils {
         String t2s = PinYin.toPinYin((String)t2);
         int maxRuselt = 0;
         if (isChinese((String) t1) && isChinese((String) t2)){
-            int minlength = t1s.length() > t2s.length() ?  t2s.length(): t1s.length() ;
+            int minlength = Math.min(t1s.length(), t2s.length());
             for (int i = 0; i < minlength; i++) {
                 if (t1s.charAt(i) - t2s.charAt(i) != 0){
                     maxRuselt = t1s.charAt(i) - t2s.charAt(i);
                     break;
                 }
             }
-        }else {
-            boolean isReturn = true;
-            try{
-                return getNumMax(t1,t2);
-            }catch (NumberFormatException e){
-                isReturn = false;
-            }
-            if (!isReturn){
-                if (t1 != null && t2 != null){
-                    if (t1s.length() > 0 && t2s.length() > 0){
-                        maxRuselt = t1s.charAt(0) - t2s.charAt(0);
+            return -maxRuselt;
+        }
+
+        if(isDate((String) t1) && isDate((String) t2)){
+            long time1 = dateToLongUx((String) t1);
+            long time2 = dateToLongUx((String) t2);
+            return time1 - time2 > 0 ? -1 : 1;
+        }
+
+        boolean isReturn = true;
+        try{
+            return getNumMax(t1,t2);
+        }catch (NumberFormatException e){
+            isReturn = false;
+        }
+        if (!isReturn){
+            if (t1 != null && t2 != null){
+                t1s = (String) t1;
+                t2s = (String) t2;
+                int minlength = Math.min(t1s.length(), t2s.length());
+                for (int i = 0; i < minlength; i++) {
+                    int i1 = t1s.charAt(i) - t2s.charAt(i);
+                    if (i1 != 0){
+                        return -i1;
                     }
                 }
             }
@@ -78,10 +95,28 @@ public class LetterUtils {
         return flg;
     }
 
+    public static boolean isDate(String str){
+        Pattern p = Pattern.compile("(\\d{4}\\-\\d{1,2}\\-\\d{1,2})+");
+        Matcher m = p.matcher(str);
+        return m.find();
+    }
+
     public static int getNumMax(Object t1 ,Object t2){
         BigDecimal t1B = new BigDecimal(t1.toString());
         BigDecimal t2B = new BigDecimal(t2.toString());
         double maxRuselt = t1B.subtract(t2B).doubleValue();
         return  maxRuselt > 0 ? -1 : 1;
+    }
+
+    public static long dateToLongUx(String dateString) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date date;
+        try {
+            date = dateFormat.parse(dateString);
+            return date.getTime();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
